@@ -2,7 +2,6 @@
   <table class="table table-bordered table-hover">
     <thead>
       <tr>
-
         <th>ID</th>
         <th>Username</th>
         <th>First Name</th>
@@ -38,10 +37,13 @@
             <td> <?php echo $user_role; ?></td>
             <td> <a href="users.php?ugadmin=<?php echo $user_id ?>">Upgrade To Admin</a></td>
             <td> <a href="users.php?subs=<?php echo $user_id ?>">Make Subscriber</a></td>
-            <td> <a href="users.php?delete=<?php echo $user_id ?>">Delete</a></td>
+            <form action="" method="post">
+                 <input type="hidden" name="user_id" value='<?php echo $user_id; ?>'>
+                 <?php echo "<td><input type='submit' name='delete' value='Delete' class='btn btn-danger'></td>"; ?>
+            </form>
             <td> <a href="users.php?source=edit&u_id=<?php echo $user_id ?>">Edit</a></td>
           </tr>
-        <?php  } ?>
+        <?php  }?>
     </tbody>
   </table>
 </div>
@@ -49,29 +51,44 @@
 <?php
 
   //UPGRADE USER TO ADMIN
-  if(isset($_GET['ugadmin'])){
-    $user_id = $_GET['ugadmin'];
-    $query = "UPDATE users SET user_role = 'admin' WHERE user_id = $user_id";
-    $result = mysqli_query($connection,$query);
-    confirmQuery($result);
-    header("Location: users.php");
+  if(isset($_GET['ugadmin'])) {
+    if(isset($_SESSION['user_role'])) {
+      if($_SESSION['user_role'] === 'admin') {
+        $user_id = escapse($_GET['ugadmin']);
+        $query = "UPDATE users SET user_role = 'admin' WHERE user_id = $user_id";
+        $result = mysqli_query($connection,$query);
+        confirmQuery($result);
+        header("Location: users.php");
+      }
+    }
   }
   //DOWNGRADE USER TO SUBSCRIBER
-  if(isset($_GET['subs'])){
-    $user_id = $_GET['subs'];
-    $query = "UPDATE users SET user_role = 'subscriber' WHERE user_id = $user_id";
-    $result = mysqli_query($connection,$query);
-    confirmQuery($result);
-    header("Location: users.php");
+  if(isset($_GET['subs'])) {
+    if(isset($_SESSION['user_role'])) {
+      if($_SESSION['user_role'] === 'admin') {
+        $user_id = escapse($_GET['subs']);
+        $query = "UPDATE users SET user_role = 'subscriber' WHERE user_id = $user_id";
+        $result = mysqli_query($connection,$query);
+        confirmQuery($result);
+        header("Location: users.php");
+      }
+    }
   }
 
   //DELETE USER FROM ADMIN AREA
-  if(isset($_GET['delete'])){
-    $user_id = $_GET['delete'];
-    $query = "DELETE FROM users WHERE user_id =  {$user_id}";
-    $result = mysqli_query($connection,$query);
-    confirmQuery($result);
-    header("Location: users.php");
-
+  if(isset($_POST['delete'])) {
+    if(isset($_SESSION['user_role'])) {
+      if($_SESSION['user_role'] === 'admin') {
+        $user_id  = $_POST['user_id'];
+        $query    = "DELETE FROM users WHERE user_id = ?";
+        $stmt     = mysqli_stmt_init($connection);
+        if(mysqli_stmt_prepare($stmt, $query)) {
+          mysqli_stmt_bind_param($stmt, "i", $user_id);
+          if(mysqli_stmt_execute($stmt)) {
+            header("Location: users.php");
+          }
+        }
+      }
+    }
   }
 ?>

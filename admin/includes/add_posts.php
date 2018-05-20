@@ -2,17 +2,15 @@
   //ADD A NEW POST FROM ADMIN SECTION
   if(isset($_POST['create_post'])){
     if(isset($_FILES['post_image'])){
-      $post_title = $_POST['post_title'];
-      $post_author = $_POST['post_author'];
-      $post_category_id = $_POST['post_category_id'];
-      $post_status = $_POST['post_status'];
+      $post_title       = escapse($_POST['post_title']);
+      $post_author      = escapse($_POST['post_author']);
+      $post_category_id = escapse($_POST['post_category_id']);
+      $post_status      = escapse($_POST['post_status']);
 
-      $post_tags = $_POST['post_tags'];
-      $post_content = $_POST['post_content'];
-      $post_date = date('d-m-y');
-      //$post_comment_count = 4;
-
-      $post_image = $_FILES['post_image']['name'];
+      $post_tags      = escapse($_POST['post_tags']);
+      $post_content   = escapse($_POST['post_content']);
+      $post_date      = date('d-m-y');
+      $post_image     = $_FILES['post_image']['name'];
       $post_image_tmp = $_FILES['post_image']['tmp_name'];
 
       if(move_uploaded_file($post_image_tmp,"../images/".$post_image));
@@ -56,7 +54,17 @@
   </div>
   <div class="form-group">
     <label for="author">Post Author</label>
-    <input type="text" name="post_author" id="author" class="form-control">
+    <select name="post_author" id='author' class="form-control">
+      <?php
+        $query = "SELECT * FROM users";
+        $result = mysqli_query($connection,$query);
+        confirmQuery($result);
+        while($row = mysqli_fetch_assoc($result)){
+          $username = $row['username'];
+          echo "<option value='{$username}'>{$username}</option>";
+        }
+      ?>
+    </select>
   </div>
   <div class="form-group">
     <label for="status">Post Status</label>

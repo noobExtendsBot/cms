@@ -1,36 +1,36 @@
 <?php
 
     if(isset($_GET['p_id'])){
-      $the_post_id =  ($_GET['p_id']);
+      $the_post_id =  escapse($_GET['p_id']);
     }
 
     $query = "SELECT * FROM posts WHERE post_id = $the_post_id  ";
     $select_posts_by_id = mysqli_query($connection,$query);
 
     while($row = mysqli_fetch_assoc($select_posts_by_id)) {
-        $post_id            = $row['post_id'];
-        $post_author        = $row['post_author'];
-        $post_title         = $row['post_title'];
-        $post_category_id   = $row['post_category_id'];
-        $post_status        = $row['post_status'];
-        $post_image         = $row['post_image'];
-        $post_content       = $row['post_content'];
-        $post_tags          = $row['post_tags'];
-        $post_comment_count = $row['post_comment_count'];
-        $post_date          = $row['post_date'];
+        $post_id            = escapse($row['post_id']);
+        $post_author        = escapse($row['post_author']);
+        $post_title         = escapse($row['post_title']);
+        $post_category_id   = escapse($row['post_category_id']);
+        $post_status        = escapse($row['post_status']);
+        $post_image         = escapse($row['post_image']);
+        $post_content       = escapse($row['post_content']);
+        $post_tags          = escapse($row['post_tags']);
+        $post_comment_count = escapse($row['post_comment_count']);
+        $post_date          = escapse($row['post_date']);
     }
 
 
     if(isset($_POST['update_post'])) {
 
-        $post_author         =  ($_POST['post_author']);
-        $post_title          =  ($_POST['post_title']);
-        $post_category_id    =  ($_POST['post_category']);
-        $post_status         =  ($_POST['post_status']);
-        $post_image          =  ($_FILES['image']['name']);
-        $post_image_temp     =  ($_FILES['image']['tmp_name']);
-        $post_content        =  ($_POST['post_content']);
-        $post_tags           =  ($_POST['post_tags']);
+        $post_author         =  escapse($_POST['post_author']);
+        $post_title          =  escapse($_POST['post_title']);
+        $post_category_id    =  escapse($_POST['post_category']);
+        $post_status         =  escapse($_POST['post_status']);
+        $post_image          =  escapse($_FILES['image']['name']);
+        $post_image_temp     =  escapse($_FILES['image']['tmp_name']);
+        $post_content        =  escapse($_POST['post_content']);
+        $post_tags           =  escapse($_POST['post_tags']);
 
         move_uploaded_file($post_image_temp, "../images/$post_image");
 
@@ -41,8 +41,6 @@
            $post_image = $row['post_image'];
         }
 }
-        $post_title = mysqli_real_escape_string($connection, $post_title);
-
           $query = "UPDATE posts SET ";
           $query .="post_title  = '{$post_title}', ";
           $query .="post_category_id = '{$post_category_id}', ";
@@ -70,7 +68,7 @@
 
     <div class="form-group">
        <label for="categories">Categories</label>
-       <select name="post_category" id="">
+       <select name="post_category" id="categories" class="form-control">
           <?php
 
               $query = "SELECT * FROM categories ";
@@ -94,24 +92,31 @@
 
     </div>
       <div class="form-group">
-         <label for="post_author">Post Tags</label>
-          <input value="<?php echo $post_author; ?>"  type="text" class="form-control" name="post_author">
+        <label for="post_author">Post Author</label>
+        <select name="post_author" id="post_author" class="form-control">
+          <option value="<?php echo $post_author?>"><?php echo $post_author; ?></option>
+          <?php
+            $query = "SELECT * FROM users";
+            $result = mysqli_query($connection,$query);
+            confirmQuery($result);
+            while($row = mysqli_fetch_assoc($result)) {
+              $username = $row['username'];
+              if($username!=$post_author) {
+                echo "<option value='{$username}'>{$username}</option>";
+              }
+            }
+          ?>
+        </select>
       </div>
-
-    <!--   <div class="form-group">
-         <label for="title">Post Author</label>
-          <input value="<?php// echo $post_user; ?>" type="text" class="form-control" name="post_user">
-      </div> -->
-
      <div class="form-group">
        <label for="status">Post Status</label>
         <select name="post_status" id="status">
-            <option value='<?php echo $post_status; ?>'><?php echo $post_status; ?></option>
+            <option class="form-control" value='<?php echo $post_status; ?>'><?php echo $post_status; ?></option>
             <?php
               if($post_status == 'draft'){
-                echo "<option value='published'>Publish</option>";
+                echo "<option class='form-control' value='published'>Publish</option>";
               }else{
-                echo "<option value='draft'>Draft</option>";
+                echo "<option class='form-control' value='draft'>Draft</option>";
               }
             ?>
         </select>
@@ -130,7 +135,7 @@
     </div>
     <div class="form-group">
              <label for="post_content">Post Content</label>
-             <textarea  class="form-control "name="post_content" id="" cols="30" rows="10"><?php echo $post_content; ?>
+             <textarea  class="form-control "name="post_content" id="" cols="30" rows="10"><?php echo str_replace('\r\n','<br >',$post_content); ?>
              </textarea>
           </div>
      <div class="form-group">

@@ -1,30 +1,19 @@
 <?php
   //ADD A NEW USER FROM ADMIN SECTION
   if(isset($_POST['create_user'])){
-    //if(isset($_FILES['post_image'])){
-      $username = $_POST['username'];
-      $user_firstname = $_POST['user_firstname'];
-      $user_lastname = $_POST['user_lastname'];
-      $user_password = $_POST['user_password'];
-      $user_email = $_POST['user_email'];
-      $user_role = $_POST['user_role'];
+      $username        = escapse($_POST['username']);
+      $user_firstname  = escapse($_POST['user_firstname']);
+      $user_lastname   = escapse($_POST['user_lastname']);
+      $user_password   = escapse($_POST['user_password']);
+      $user_email      = escapse($_POST['user_email']);
+      $user_role       = escapse($_POST['user_role']);
 
-      // $user_image = $_FILES['user_image']['name'];
-      // $user_image_tmp = $_FILES['user_image']['tmp_name'];
-      //
-      // if(move_uploaded_file($post_image_tmp,"../images/".$post_image));
-      //   echo "<h4 class='text-success'>Uploaded</h4>";
-
-      $query = "INSERT INTO users(username,user_password,user_firstname,user_lastname,user_email,user_role) ";
-
+      $user_password = password_hash($user_password,PASSWORD_BCRYPT,array('cost'=>12));
+      $query  = "INSERT INTO users(username,user_password,user_firstname,user_lastname,user_email,user_role) ";
       $query .= "VALUES('$username','$user_password','$user_firstname','$user_lastname','$user_email','$user_role')";
-
       $add_post_result = mysqli_query($connection, $query);
       confirmQuery($add_post_result);
       echo "<h3 class='text-success'>User Added</h3>"." <a class='btn btn-primary' href='../admin/users.php'>View All Users</a>";
-      //header("Location: users.php");
-
-    //}
   }
 ?>
 
@@ -55,10 +44,6 @@
     <label for="password">Password</label>
     <input type="password" name="user_password" id="password" class="form-control">
   </div>
-  <!-- <div class="form-group">
-    <label for="image">Post Image</label>
-    <input type="file" name="post_image">
-  </div> -->
   <div class="form-group">
     <label for="email">Email</label>
     <input type="email" name="user_email" id="email" class="form-control">

@@ -1,6 +1,7 @@
 <?php
   include "includes/header.php";
   include "includes/db.php";
+  include "functions.php";
  ?>
 
     <!-- Navigation -->
@@ -16,29 +17,22 @@
                 <!-- First Blog Post -->
                 <?php
                   if(isset($_POST['submit'])){
-                    //$connection = mysqli_connect('localhost:3305','root','','cms');
-                    $search = $_POST['search'];
-                    $query = "SELECT * FROM posts WHERE post_tag LIKE '%$search%'";
-                    $result = mysqli_query($connection, $query);
-                    if(!$result){
-                      die("Query Failed".mysqli_error());
+                    $search   = escapse(clean($_POST['search']));
+                    $query    = "SELECT * FROM posts WHERE post_tags LIKE '%$search%'";
+                    $result   = mysqli_query($connection, $query);
+                    confirmQuery($result);
+                    if(mysqli_num_rows($result) == 0){
+                      echo "<h4 class='text-center text-warning bg-warning'>No results found</h4>";
                     }
-                    $count = mysqli_num_rows($result);
-                    if($count == 0)
-                      echo "<h4>No results found</h4>";
-
-                  }
-
-                  while($row = mysqli_fetch_assoc($result)){
-                    $post_title = $row['post_title'];
-                    $post_author = $row['post_author'];
-                    $post_date = $row['post_date'];
-                    $post_image = $row['post_image'];
-                    $post_content = $row['post_content'];
-                  ?>
+                    else{
+                    while($row = mysqli_fetch_assoc($result)){
+                      $post_title   = $row['post_title'];
+                      $post_author  = $row['post_author'];
+                      $post_date    = $row['post_date'];
+                      $post_image   = $row['post_image'];
+                      $post_content = $row['post_content'];
+                    ?>
                   <h1 class="page-header">
-                      Page Heading
-                      <small>Secondary Text</small>
                   </h1>
                   <h2>
                       <a href="#"><?php echo $post_title; ?></a>
@@ -55,7 +49,7 @@
                   <a class="btn btn-primary" href="#">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
 
                   <hr>
-                <?php } ?>
+                <?php }}} ?>
             </div>
 
             <!-- Blog Sidebar Widgets Colum/includes/db.phpn -->

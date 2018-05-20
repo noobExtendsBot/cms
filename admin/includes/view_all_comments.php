@@ -59,41 +59,48 @@
 
   //APPROVE COMMENT STATUS
   if(isset($_GET['approve'])){
-    $comment_id = $_GET['approve'];
-    $query = "UPDATE comments SET comment_status = 'approved' WHERE comment_id = $comment_id";
-    $approve_result = mysqli_query($connection,$query);
-    confirmQuery($approve_result);
-    header("Location: comments.php");
+    if(isset($_SESSION['user_role'])){
+      if($_SESSION['user_role'] === 'admin'){
+        $comment_id = $_GET['approve'];
+        $query = "UPDATE comments SET comment_status = 'approved' WHERE comment_id = $comment_id";
+        $approve_result = mysqli_query($connection,$query);
+        confirmQuery($approve_result);
+        header("Location: comments.php");
+      }
+    }
   }
+
   //UNAPPROVE COMMENT STATUS
   if(isset($_GET['unapprove'])){
-    $comment_id = $_GET['unapprove'];
-    $query = "UPDATE comments SET comment_status = 'unapproved' WHERE comment_id = $comment_id";
-    $unapprove_result = mysqli_query($connection,$query);
-    confirmQuery($unapprove_result);
-    header("Location: comments.php");
+    if(isset($_SESSION['user_role'])){
+      if($_SESSION['user_role'] === 'admin'){
+        $comment_id = $_GET['unapprove'];
+        $query = "UPDATE comments SET comment_status = 'unapproved' WHERE comment_id = $comment_id";
+        $unapprove_result = mysqli_query($connection,$query);
+        confirmQuery($unapprove_result);
+        header("Location: comments.php");
+      }
+    }
   }
 
   //DELETE COMMENT FROM ADMIN AREA AND DECREMENT THE COMMENT COUNT
   if(isset($_GET['delete'])){
-    $comment_id = $_GET['delete'];
-    //decrement the comment count
-    $comment_post_id_query = "SELECT * FROM comments WHERE comment_id = {$comment_id}";
-    $result = mysqli_query($connection, $comment_post_id_query);
-    confirmQuery($result);
-    // while($row = mysqli_fetch_assoc($result)){
-    //   $comment_post_id = $row['comment_post_id'];
-    // }
-
-    $comment_post_id = mysqli_fetch_object($result)->comment_post_id;
-    $query = "UPDATE posts SET post_comment_count = post_comment_count - 1 ";
-    $query .= "WHERE post_id = $comment_post_id";
-    $result = mysqli_query($connection,$query);
-    confirmQuery($result);
-    $query = "DELETE FROM comments WHERE comment_id =  {$comment_id}";
-    $result = mysqli_query($connection,$query);
-    confirmQuery($result);
-    header("Location: comments.php");
-
+    if(isset($_SESSION['user_role'])){
+      if($_SESSION['user_role'] === 'admin'){
+        $comment_id = $_GET['delete'];
+        $comment_post_id_query = "SELECT * FROM comments WHERE comment_id = {$comment_id}";
+        $result = mysqli_query($connection, $comment_post_id_query);
+        confirmQuery($result);
+        $comment_post_id = mysqli_fetch_object($result)->comment_post_id;
+        $query = "UPDATE posts SET post_comment_count = post_comment_count - 1 ";
+        $query .= "WHERE post_id = $comment_post_id";
+        $result = mysqli_query($connection,$query);
+        confirmQuery($result);
+        $query = "DELETE FROM comments WHERE comment_id =  {$comment_id}";
+        $result = mysqli_query($connection,$query);
+        confirmQuery($result);
+        header("Location: comments.php");
+      }
+    }
   }
 ?>
